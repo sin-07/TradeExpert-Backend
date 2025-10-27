@@ -29,7 +29,9 @@ app.use(express.urlencoded({ extended: true }));
 const allowedOrigins = [
   'http://localhost:5173', // Development
   'http://localhost:3000', // Alternative dev port
-  process.env.FRONTEND_URL, // From .env
+  'https://trade-expert-frontend.vercel.app', // Production
+  process.env.FRONTEND_URL, // From .env (dev)
+  process.env.PRODUCTION_URL, // From .env (production)
 ].filter(Boolean);
 
 app.use(cors({ 
