@@ -1,0 +1,113 @@
+===============================================
+📧 WELCOME EMAIL SYSTEM - INSTALLATION STEPS
+===============================================
+
+⚠️ IMPORTANT: Run these commands in the backend directory!
+
+Step 1: Navigate to Backend Directory
+--------------------------------------
+cd C:\Users\anike\CODES\tradexpert\tradexpert-backend
+
+
+Step 2: Install Puppeteer
+--------------------------
+npm install puppeteer
+
+Note: This will download Chromium (~170-280MB). Be patient!
+
+
+Step 3: Verify Installation
+----------------------------
+npm list puppeteer
+
+You should see: puppeteer@21.x.x (or similar)
+
+
+Step 4: Test the Backend
+-------------------------
+npm run dev
+
+The server should start without errors.
+
+
+Step 5: Test the Flow
+----------------------
+1. Go to frontend: http://localhost:5173/signup
+2. Create a new account
+3. Verify OTP from email
+4. Check your email inbox for:
+   ✉️ Welcome email with subject: "🎉 Welcome to TradeXpert"
+   📎 PDF attachment: "TradeXpert_Welcome_Guide.pdf"
+
+
+===============================================
+📁 WHAT WAS CREATED/MODIFIED
+===============================================
+
+NEW FILES:
+----------
+✅ utils/pdfGenerator.js           - Generates PDF from HTML
+✅ pdf/README.md                    - Documentation for PDF folder
+✅ .gitignore                       - Ignores generated PDFs
+✅ WELCOME_EMAIL_SETUP.md           - Detailed setup guide
+
+MODIFIED FILES:
+---------------
+📝 email/emailTemplates.js         - Added welcomeEmailTemplate
+📝 email/emailService.js           - Added sendWelcomeEmail function
+📝 controllers/authController.js   - Added PDF generation & email sending
+📝 package.json                     - Added puppeteer dependency
+
+
+===============================================
+✅ VERIFICATION CHECKLIST
+===============================================
+
+□ Puppeteer installed (npm list puppeteer)
+□ Backend starts without errors (npm run dev)
+□ PDF folder exists (tradexpert-backend/pdf/)
+□ Environment variables set (.env file):
+  - EMAIL_USER=your-gmail@gmail.com
+  - EMAIL_PASSWORD=your-app-password
+  - JWT_SECRET=your-secret
+
+□ Test signup & receive welcome email with PDF
+
+
+===============================================
+🚨 TROUBLESHOOTING
+===============================================
+
+Problem: "Puppeteer not found"
+Solution: Run: npm install puppeteer
+
+Problem: "Chromium download failed"
+Solution: Run: npx puppeteer browsers install chrome
+
+Problem: "Cannot write PDF"
+Solution: Check folder permissions on /pdf directory
+
+Problem: "Email not sending"
+Solution: 
+  1. Check Gmail credentials in .env
+  2. Use App Password (not regular password)
+  3. Enable "Less secure app access" (if needed)
+
+
+===============================================
+📖 FOR MORE INFO
+===============================================
+
+Read: WELCOME_EMAIL_SETUP.md
+Location: tradexpert-backend/WELCOME_EMAIL_SETUP.md
+
+
+===============================================
+🎉 READY TO TEST!
+===============================================
+
+1. Install puppeteer: npm install puppeteer
+2. Start backend: npm run dev
+3. Test signup flow
+4. Check email for welcome PDF!
+
