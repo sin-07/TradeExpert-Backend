@@ -48,6 +48,10 @@ coverage/
 .DS_Store
 Thumbs.db
 
+# Documentation files
+*.md
+!package.json
+
 # PDF files (generated welcome PDFs)
 pdf/*.pdf
 !pdf/.gitkeep
