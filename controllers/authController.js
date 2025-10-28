@@ -149,8 +149,14 @@ exports.resendOTP = async (req, res) => {
     pendingUser.otpExpiry = otpExpiry;
     await pendingUser.save();
 
-    // Send OTP email
-    await sendOTPEmail(email, otp, pendingUser.name);
+    // Send OTP email asynchronously (non-blocking)
+    sendOTPEmail(email, otp, pendingUser.name)
+      .then((info) => {
+        console.log('Resend OTP email queued/sent successfully for:', email, info?.messageId || 'no-id');
+      })
+      .catch((emailError) => {
+        console.error('Resend OTP email failed (non-blocking):', emailError?.message || emailError);
+      });
 
     res.json({ message: 'OTP resent successfully' });
   } catch (err) {
