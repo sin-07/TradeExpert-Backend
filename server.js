@@ -62,6 +62,24 @@ app.use(limiter);
 // Static uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Root route - API info
+app.get('/', (req, res) => {
+  res.json({
+    name: 'TradeXpert API',
+    version: '1.0.0',
+    status: 'running',
+    message: 'Welcome to TradeXpert Backend API',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      products: '/api/products',
+      orders: '/api/orders',
+      stocks: '/api/stocks',
+      search: '/api/search'
+    }
+  });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
