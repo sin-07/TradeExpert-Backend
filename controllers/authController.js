@@ -42,19 +42,21 @@ exports.signup = async (req, res) => {
     });
     await pendingUser.save();
 
-    // Send OTP email
-    try {
-      await sendOTPEmail(email, otp, name);
-      res.json({ 
-        message: 'Signup successful. Please verify your email with the OTP sent to your inbox.',
-        email: email
+    // Send OTP email asynchronously so the API responds immediately
+    // If email sending fails, user can use the Resend OTP endpoint
+    sendOTPEmail(email, otp, name)
+      .then((info) => {
+        console.log('OTP email queued/sent successfully for:', email, info?.messageId || 'no-id');
+      })
+      .catch((emailError) => {
+        console.error('Email sending failed (non-blocking):', emailError?.message || emailError);
       });
-    } catch (emailError) {
-      console.error('Email sending failed:', emailError);
-      // Delete pending user if email fails
-      await PendingUser.deleteOne({ email });
-      return res.status(500).json({ message: 'Failed to send verification email. Please try again.' });
-    }
+
+    // Respond immediately after saving pending user
+    return res.json({ 
+      message: 'Signup initiated. Please verify your email with the OTP sent to your inbox. If you do not receive it within a minute, use Resend OTP.',
+      email: email
+    });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
