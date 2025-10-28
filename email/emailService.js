@@ -11,19 +11,22 @@ const sendOTPEmail = async (email, otp, userName) => {
     if (resendClient) {
       // Use Resend API (works on all hosting platforms)
       console.log('[EMAIL] Using Resend API')
-      const { data, error } = await resendClient.emails.send({
+      const result = await resendClient.emails.send({
         from: 'TradeXpert <onboarding@resend.dev>', // Resend's test domain
         to: email,
         subject: 'Your TradeXpert Verification Code',
         html: otpEmailTemplate(otp, userName),
       });
       
-      if (error) {
-        throw new Error(error.message);
+      console.log('[EMAIL] Resend API response:', JSON.stringify(result));
+      
+      if (result.error) {
+        console.error('[EMAIL] Resend API error:', JSON.stringify(result.error));
+        throw new Error(JSON.stringify(result.error));
       }
       
-      console.log('[EMAIL] OTP email sent successfully via Resend:', data.id);
-      return { success: true, messageId: data.id };
+      console.log('[EMAIL] OTP email sent successfully via Resend:', result.data?.id);
+      return { success: true, messageId: result.data?.id };
     } else {
       // Use Gmail SMTP (for local development)
       console.log('[EMAIL] Using Gmail SMTP')
@@ -58,19 +61,20 @@ const sendWelcomeEmail = async (email, userName, pdfPath) => {
     if (resendClient) {
       // Use Resend API - note: attachments require paid plan
       console.log('[EMAIL] Sending welcome email via Resend (without PDF attachment on free plan)')
-      const { data, error } = await resendClient.emails.send({
+      const result = await resendClient.emails.send({
         from: 'TradeXpert <onboarding@resend.dev>',
         to: email,
         subject: '🎉 Welcome to TradeXpert - Your Trading Journey Begins!',
         html: welcomeEmailTemplate(userName),
       });
       
-      if (error) {
-        throw new Error(error.message);
+      if (result.error) {
+        console.error('[EMAIL] Resend API error for welcome email:', JSON.stringify(result.error));
+        throw new Error(JSON.stringify(result.error));
       }
       
-      console.log('[EMAIL] Welcome email sent successfully via Resend:', data.id);
-      return { success: true, messageId: data.id };
+      console.log('[EMAIL] Welcome email sent successfully via Resend:', result.data?.id);
+      return { success: true, messageId: result.data?.id };
     } else {
       // Use Gmail SMTP with PDF attachment
       const transporter = createTransporter();
