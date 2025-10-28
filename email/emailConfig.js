@@ -1,32 +1,36 @@
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 // Create transporter for sending emails
 const createTransporter = () => {
-  // Configure transporter with sensible timeouts to avoid long request hangs
-  const port = Number(process.env.EMAIL_PORT) || 587;
-  const secure = String(port) === '465'; // secure true for 465, false otherwise
-
+  // If RESEND_API_KEY is available, use Resend (works on all hosting platforms)
+  if (process.env.RESEND_API_KEY) {
+    console.log('[EMAIL] Using Resend API for email delivery');
+    return null; // We'll handle Resend differently in emailService
+  }
+  
+  // Otherwise use Gmail with nodemailer (for local development)
+  console.log('[EMAIL] Using Gmail SMTP for email delivery');
   return nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port,
-    secure,
+    service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER, // Your email
-      pass: process.env.EMAIL_PASSWORD, // App password recommended
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
     },
-    // Avoid long hangs on cold SMTP or blocked egress by setting timeouts
-    connectionTimeout: 10000, // 10s to establish connection
-    greetingTimeout: 10000,   // 10s to receive greeting after connection
-    socketTimeout: 20000,     // 20s for data transfer operations
-    // Use a small pool for efficiency; keeps connection warm across requests
-    pool: true,
-    maxConnections: 1,
-    maxMessages: 100,
-    tls: {
-      // Some providers on PaaS may require this to prevent cert issues
-      rejectUnauthorized: false,
-    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 20000,
   });
 };
+
+// Create Resend client if API key is available
+const createResendClient = () => {
+  if (process.env.RESEND_API_KEY) {
+    return new Resend(process.env.RESEND_API_KEY);
+  }
+  return null;
+};
+
+module.exports = { createTransporter, createResendClient };
 
 module.exports = { createTransporter };
