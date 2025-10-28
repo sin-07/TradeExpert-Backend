@@ -34,125 +34,125 @@ const generateWelcomePDF = async (userName, userEmail) => {
         .header {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
-          padding: 20px 40px;
+          padding: 12px 30px;
           text-align: center;
-          border-bottom: 3px solid rgba(255,255,255,0.3);
+          border-bottom: 2px solid rgba(255,255,255,0.3);
         }
         .header h1 {
-          font-size: 36px;
+          font-size: 28px;
           font-weight: 700;
-          margin-bottom: 4px;
+          margin-bottom: 2px;
           letter-spacing: -0.5px;
         }
         .header .tagline {
-          font-size: 13px;
+          font-size: 10px;
           opacity: 0.95;
           font-weight: 300;
-          letter-spacing: 1px;
+          letter-spacing: 0.8px;
         }
         .content-wrapper {
           background: white;
-          margin: 0 30px;
-          padding: 20px 30px;
-          min-height: calc(297mm - 160px);
+          margin: 0 25px;
+          padding: 12px 25px;
+          min-height: calc(297mm - 120px);
         }
         .welcome-section {
           background: linear-gradient(to right, #f8f9ff, #ffffff);
-          border-left: 4px solid #667eea;
-          padding: 15px 20px;
-          margin-bottom: 18px;
-          border-radius: 0 6px 6px 0;
+          border-left: 3px solid #667eea;
+          padding: 10px 15px;
+          margin-bottom: 10px;
+          border-radius: 0 4px 4px 0;
         }
         .welcome-section h2 {
           color: #667eea;
-          font-size: 20px;
-          margin-bottom: 6px;
+          font-size: 15px;
+          margin-bottom: 3px;
           font-weight: 600;
         }
         .welcome-section p {
           color: #555;
-          font-size: 13px;
-          line-height: 1.6;
+          font-size: 10px;
+          line-height: 1.4;
         }
         .user-card {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
-          padding: 14px 20px;
-          border-radius: 10px;
-          margin-bottom: 18px;
-          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+          padding: 10px 15px;
+          border-radius: 8px;
+          margin-bottom: 10px;
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
         }
         .user-card .label {
-          font-size: 10px;
+          font-size: 8px;
           opacity: 0.9;
           font-weight: 500;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 0.4px;
         }
         .user-card .value {
-          font-size: 14px;
+          font-size: 11px;
           font-weight: 600;
-          margin-top: 2px;
+          margin-top: 1px;
         }
         .user-grid {
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
-          gap: 15px;
+          gap: 10px;
         }
         .section-title {
-          font-size: 18px;
+          font-size: 14px;
           color: #1a1a1a;
-          margin: 20px 0 12px 0;
+          margin: 12px 0 8px 0;
           font-weight: 600;
           display: flex;
           align-items: center;
-          border-bottom: 2px solid #667eea;
-          padding-bottom: 6px;
+          border-bottom: 1.5px solid #667eea;
+          padding-bottom: 4px;
         }
         .section-title .icon {
-          font-size: 22px;
-          margin-right: 8px;
+          font-size: 16px;
+          margin-right: 6px;
         }
         .features-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: 12px;
-          margin-bottom: 18px;
+          gap: 8px;
+          margin-bottom: 10px;
         }
         .feature-card {
           background: #f8f9ff;
           border: 1px solid #e0e5ff;
-          border-left: 3px solid #667eea;
-          padding: 12px 14px;
-          border-radius: 6px;
+          border-left: 2px solid #667eea;
+          padding: 8px 10px;
+          border-radius: 4px;
         }
         .feature-card .feature-icon {
-          font-size: 24px;
-          margin-bottom: 6px;
+          font-size: 18px;
+          margin-bottom: 4px;
           display: block;
         }
         .feature-card h3 {
-          font-size: 13px;
+          font-size: 10px;
           color: #667eea;
-          margin-bottom: 4px;
+          margin-bottom: 2px;
           font-weight: 600;
         }
         .feature-card p {
-          font-size: 11px;
+          font-size: 8.5px;
           color: #666;
-          line-height: 1.4;
+          line-height: 1.3;
         }
         .steps-container {
           background: #f8f9fa;
-          padding: 15px 20px;
-          border-radius: 10px;
-          margin-bottom: 18px;
+          padding: 10px 15px;
+          border-radius: 8px;
+          margin-bottom: 10px;
         }
         .step {
           display: flex;
           align-items: flex-start;
-          margin-bottom: 12px;
-          padding-bottom: 12px;
+          margin-bottom: 8px;
+          padding-bottom: 8px;
           border-bottom: 1px dashed #dee2e6;
         }
         .step:last-child {
@@ -163,69 +163,69 @@ const generateWelcomePDF = async (userName, userEmail) => {
         .step-number {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
-          width: 32px;
-          height: 32px;
+          width: 26px;
+          height: 26px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: 700;
-          font-size: 15px;
+          font-size: 12px;
           flex-shrink: 0;
-          margin-right: 12px;
-          box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+          margin-right: 10px;
+          box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
         }
         .step-content h3 {
-          font-size: 13px;
+          font-size: 10px;
           color: #1a1a1a;
-          margin-bottom: 3px;
+          margin-bottom: 2px;
           font-weight: 600;
         }
         .step-content p {
-          font-size: 11px;
+          font-size: 8.5px;
           color: #666;
-          line-height: 1.4;
+          line-height: 1.3;
         }
         .support-banner {
           background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-          border: 2px solid #667eea;
-          border-radius: 10px;
-          padding: 12px 20px;
-          margin-top: 18px;
+          border: 1.5px solid #667eea;
+          border-radius: 8px;
+          padding: 8px 15px;
+          margin-top: 10px;
           text-align: center;
         }
         .support-banner h3 {
           color: #667eea;
-          font-size: 14px;
-          margin-bottom: 6px;
+          font-size: 11px;
+          margin-bottom: 4px;
           font-weight: 600;
         }
         .support-banner p {
           color: #555;
-          font-size: 11px;
-          margin: 3px 0;
+          font-size: 8.5px;
+          margin: 2px 0;
         }
         .support-banner .email {
           color: #667eea;
           font-weight: 600;
-          font-size: 12px;
+          font-size: 9.5px;
         }
         .footer {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
           text-align: center;
-          padding: 15px 40px;
+          padding: 10px 30px;
           margin-top: 0;
         }
         .footer p {
-          font-size: 11px;
+          font-size: 8.5px;
           opacity: 0.95;
-          margin: 3px 0;
+          margin: 2px 0;
         }
         .footer .brand {
           font-weight: 700;
-          font-size: 14px;
-          margin-bottom: 4px;
+          font-size: 11px;
+          margin-bottom: 2px;
         }
       </style>
     </head>
@@ -239,7 +239,7 @@ const generateWelcomePDF = async (userName, userEmail) => {
         <div class="content-wrapper">
           <div class="welcome-section">
             <h2>Hello ${userName}! 👋</h2>
-            <p>We're thrilled to welcome you to TradeXpert! Your account has been successfully created and is now ready for trading. This guide will help you get started with our platform and make the most of its powerful features.</p>
+            <p>We're thrilled to welcome you to TradeXpert! Your account is ready for trading.</p>
           </div>
 
           <div class="user-card">
@@ -316,16 +316,13 @@ const generateWelcomePDF = async (userName, userEmail) => {
 
           <div class="support-banner">
             <h3>📞 Need Assistance?</h3>
-            <p>Our support team is available 24/7 to help you</p>
-            <p class="email">support@tradexpert.com</p>
-            <p style="margin-top: 10px;">Visit our Help Center for detailed guides and tutorials</p>
+            <p>24/7 Support: <span class="email">support@tradexpert.com</span></p>
           </div>
         </div>
 
         <div class="footer">
           <p class="brand">TradeXpert</p>
-          <p>Trade Smarter, Not Harder</p>
-          <p style="margin-top: 10px; opacity: 0.8;">© ${new Date().getFullYear()} TradeXpert. All rights reserved.</p>
+          <p>© ${new Date().getFullYear()} TradeXpert. All rights reserved.</p>
         </div>
       </div>
     </body>
@@ -353,10 +350,10 @@ const generateWelcomePDF = async (userName, userEmail) => {
       format: 'A4',
       printBackground: true,
       margin: {
-        top: '10px',
-        right: '10px',
-        bottom: '10px',
-        left: '10px'
+        top: '5px',
+        right: '5px',
+        bottom: '5px',
+        left: '5px'
       }
     });
     
