@@ -6,6 +6,9 @@ const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
 
+console.log('[STARTUP] TradeXpert Backend v1.1 - Resend Email Integration');
+console.log('[STARTUP] Email method:', process.env.RESEND_API_KEY ? 'Resend API' : 'Gmail SMTP');
+
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
