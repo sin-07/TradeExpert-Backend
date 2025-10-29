@@ -143,4 +143,47 @@ router.get('/us-stocks', async (req, res) => {
   }
 });
 
+// Proxy route for historical chart data (to avoid CORS issues)
+router.get('/historical', async (req, res) => {
+  try {
+    const { symbol, interval, range } = req.query;
+    
+    if (!symbol) {
+      return res.status(400).json({ message: 'Symbol parameter required' });
+    }
+
+    const validInterval = interval || '5m';
+    const validRange = range || '1d';
+
+    console.log(`Fetching historical data for ${symbol}: interval=${validInterval}, range=${validRange}`);
+
+    const fetch = (await import('node-fetch')).default;
+    
+    const response = await fetch(
+      `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${validInterval}&range=${validRange}`,
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'application/json'
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Yahoo Finance API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    console.log(`Successfully fetched historical data for ${symbol}`);
+    
+    // Return the raw Yahoo Finance response
+    res.json(data);
+    
+  } catch (error) {
+    console.error('Error fetching historical data:', error.message);
+    res.status(500).json({ message: 'Failed to fetch historical data', error: error.message });
+  }
+});
+
 module.exports = router;
