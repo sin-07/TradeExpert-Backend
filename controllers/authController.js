@@ -1,11 +1,9 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
 const User = require('../models/User');
 const PendingUser = require('../models/PendingUser');
 const { sendOTPEmail, sendWelcomeEmail } = require('../email/emailService');
-const { generateWelcomePDF } = require('../utils/pdfGenerator');
 
 // Generate 6-digit OTP
 const generateOTP = () => {
@@ -18,7 +16,7 @@ exports.signup = async (req, res) => {
 
   const { name, email, password } = req.body;
   try {
-    // Check if user already exists in main User collection
+    // Check if user already exists
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: 'User already exists' });
 
@@ -32,7 +30,7 @@ exports.signup = async (req, res) => {
     // Delete any existing pending user with this email
     await PendingUser.deleteOne({ email });
 
-    // Store in PendingUser collection (not in main User collection yet)
+    // Store in PendingUser collection
     const pendingUser = new PendingUser({ 
       name, 
       email, 
@@ -42,23 +40,22 @@ exports.signup = async (req, res) => {
     });
     await pendingUser.save();
 
-    // Send OTP email asynchronously so the API responds immediately
-    // If email sending fails, user can use the Resend OTP endpoint
+    // Send OTP email (non-blocking - errors logged but don't fail the request)
     sendOTPEmail(email, otp, name)
-      .then((info) => {
-        console.log('OTP email queued/sent successfully for:', email, info?.messageId || 'no-id');
+      .then(() => {
+        console.log('✅ OTP email queued successfully for:', email);
       })
       .catch((emailError) => {
-        console.error('Email sending failed (non-blocking):', emailError?.message || emailError);
+        console.error('⚠️ Email sending failed (non-blocking):', emailError.message);
       });
 
-    // Respond immediately after saving pending user
+    // Respond immediately
     return res.json({ 
-      message: 'Signup initiated. Please verify your email with the OTP sent to your inbox. If you do not receive it within a minute, use Resend OTP.',
+      message: 'Signup successful! Please check your email (or console in dev mode) for the OTP code.',
       email: email
     });
   } catch (err) {
-    console.error(err.message);
+    console.error('❌ Signup error:', err.message);
     res.status(500).send('Server error');
   }
 };
@@ -85,7 +82,7 @@ exports.verifyOTP = async (req, res) => {
       return res.status(400).json({ message: 'Invalid OTP' });
     }
 
-    // OTP is valid - now create the actual user
+    // OTP is valid - create the actual user
     const user = new User({
       name: pendingUser.name,
       email: pendingUser.email,
@@ -97,36 +94,26 @@ exports.verifyOTP = async (req, res) => {
     // Delete pending user
     await PendingUser.deleteOne({ email });
 
-    // Generate welcome PDF
-    let pdfPath = null;
-    try {
-      const pdfResult = await generateWelcomePDF(pendingUser.name, pendingUser.email);
-      pdfPath = pdfResult.filePath;
-      
-      // Send welcome email with PDF attachment
-      await sendWelcomeEmail(pendingUser.email, pendingUser.name, pdfPath);
-      console.log('Welcome email sent successfully to:', pendingUser.email);
-    } catch (emailError) {
-      console.error('Failed to send welcome email:', emailError);
-      // Don't fail the verification if email fails
-    } finally {
-      // Clean up PDF file after sending email (optional)
-      // Uncomment the lines below if you want to delete the PDF after sending
-      // if (pdfPath && fs.existsSync(pdfPath)) {
-      //   fs.unlinkSync(pdfPath);
-      // }
-    }
+    // Send welcome email (non-blocking - failure won't affect user registration)
+    sendWelcomeEmail(pendingUser.email, pendingUser.name)
+      .then(() => {
+        console.log('✅ Welcome email sent successfully to:', pendingUser.email);
+      })
+      .catch((emailError) => {
+        console.error('⚠️ Welcome email failed (non-blocking):', emailError.message);
+      });
 
+    // Generate JWT token
     const payload = { id: user._id };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
 
     res.json({ 
-      message: 'Email verified successfully. Welcome email sent!',
+      message: 'Email verified successfully! Welcome to TradeXpert.',
       token, 
       user: { id: user._id, name: user.name, email: user.email, isVerified: user.isVerified } 
     });
   } catch (err) {
-    console.error(err.message);
+    console.error('❌ OTP verification error:', err.message);
     res.status(500).send('Server error');
   }
 };
@@ -149,18 +136,18 @@ exports.resendOTP = async (req, res) => {
     pendingUser.otpExpiry = otpExpiry;
     await pendingUser.save();
 
-    // Send OTP email asynchronously (non-blocking)
+    // Send OTP email (non-blocking)
     sendOTPEmail(email, otp, pendingUser.name)
-      .then((info) => {
-        console.log('Resend OTP email queued/sent successfully for:', email, info?.messageId || 'no-id');
+      .then(() => {
+        console.log('✅ Resend OTP email sent successfully for:', email);
       })
       .catch((emailError) => {
-        console.error('Resend OTP email failed (non-blocking):', emailError?.message || emailError);
+        console.error('⚠️ Resend OTP email failed (non-blocking):', emailError.message);
       });
 
-    res.json({ message: 'OTP resent successfully' });
+    res.json({ message: 'New OTP sent! Check your email (or console in dev mode).' });
   } catch (err) {
-    console.error(err.message);
+    console.error('❌ Resend OTP error:', err.message);
     res.status(500).send('Server error');
   }
 };

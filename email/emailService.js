@@ -1,105 +1,104 @@
-const { createTransporter, createResendClient } = require('./emailConfig');
+const { createResendClient } = require('./emailConfig');
 const { otpEmailTemplate, welcomeEmailTemplate } = require('./emailTemplates');
 
+/**
+ * Simplified OTP email sending
+ * - Development: Logs OTP to console
+ * - Production: Uses Resend API
+ */
 const sendOTPEmail = async (email, otp, userName) => {
   try {
-    console.log('[EMAIL] Starting OTP email send to:', email)
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('📧 OTP EMAIL');
+    console.log('To:', email);
+    console.log('Name:', userName);
+    console.log('OTP Code:', otp);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     
-    // Check if we should use Resend or Nodemailer
     const resendClient = createResendClient();
     
-    if (resendClient) {
-      // Use Resend API (works on all hosting platforms)
-      console.log('[EMAIL] Using Resend API')
-      const result = await resendClient.emails.send({
-        from: 'TradeXpert <onboarding@resend.dev>', // Resend's test domain
-        to: email,
-        subject: 'Your TradeXpert Verification Code',
-        html: otpEmailTemplate(otp, userName),
-      });
-      
-      console.log('[EMAIL] Resend API response:', JSON.stringify(result));
-      
-      if (result.error) {
-        console.error('[EMAIL] Resend API error:', JSON.stringify(result.error));
-        throw new Error(JSON.stringify(result.error));
-      }
-      
-      console.log('[EMAIL] OTP email sent successfully via Resend:', result.data?.id);
-      return { success: true, messageId: result.data?.id };
-    } else {
-      // Use Gmail SMTP (for local development)
-      console.log('[EMAIL] Using Gmail SMTP')
-      console.log('[EMAIL] Email config:', {
-        user: process.env.EMAIL_USER ? 'configured' : 'NOT SET',
-        pass: process.env.EMAIL_PASSWORD ? 'configured' : 'NOT SET',
-      })
-      
-      const transporter = createTransporter();
-      const mailOptions = {
-        from: `"TradeXpert" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: 'Your TradeXpert Verification Code',
-        html: otpEmailTemplate(otp, userName),
-      };
-
-      const info = await transporter.sendMail(mailOptions);
-      console.log('[EMAIL] OTP email sent successfully via Gmail:', info.messageId);
-      return { success: true, messageId: info.messageId };
+    if (!resendClient) {
+      // Development mode - just log to console
+      console.log('✅ [DEV MODE] OTP logged to console above');
+      return { success: true, messageId: 'console-log', mode: 'development' };
     }
+    
+    // Production mode - send via Resend
+    const result = await resendClient.emails.send({
+      from: 'TradeXpert <onboarding@resend.dev>',
+      to: email,
+      subject: 'Your TradeXpert Verification Code',
+      html: otpEmailTemplate(otp, userName),
+    });
+    
+    if (result.error) {
+      console.error('❌ Resend API error:', result.error);
+      throw new Error(`Resend error: ${JSON.stringify(result.error)}`);
+    }
+    
+    console.log('✅ OTP email sent via Resend:', result.data?.id || result.id);
+    return { success: true, messageId: result.data?.id || result.id, mode: 'production' };
+    
   } catch (error) {
-    console.error('[EMAIL] Error sending OTP email:', error.message)
-    console.error('[EMAIL] Full error:', error)
-    throw new Error('Failed to send OTP email')
+    console.error('❌ Error sending OTP email:', error.message);
+    // In development, this is not critical - OTP is in console
+    if (!createResendClient()) {
+      console.log('💡 Development mode: Check console above for OTP code');
+      return { success: true, messageId: 'console-fallback', mode: 'development-fallback' };
+    }
+    throw error;
   }
 };
 
-const sendWelcomeEmail = async (email, userName, pdfPath) => {
+/**
+ * Simplified welcome email sending
+ * - Development: Logs to console
+ * - Production: Uses Resend API (without PDF on free plan)
+ */
+const sendWelcomeEmail = async (email, userName) => {
   try {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🎉 WELCOME EMAIL');
+    console.log('To:', email);
+    console.log('Name:', userName);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
     const resendClient = createResendClient();
     
-    if (resendClient) {
-      // Use Resend API - note: attachments require paid plan
-      console.log('[EMAIL] Sending welcome email via Resend (without PDF attachment on free plan)')
-      const result = await resendClient.emails.send({
-        from: 'TradeXpert <onboarding@resend.dev>',
-        to: email,
-        subject: '🎉 Welcome to TradeXpert - Your Trading Journey Begins!',
-        html: welcomeEmailTemplate(userName),
-      });
-      
-      if (result.error) {
-        console.error('[EMAIL] Resend API error for welcome email:', JSON.stringify(result.error));
-        throw new Error(JSON.stringify(result.error));
-      }
-      
-      console.log('[EMAIL] Welcome email sent successfully via Resend:', result.data?.id);
-      return { success: true, messageId: result.data?.id };
-    } else {
-      // Use Gmail SMTP with PDF attachment
-      const transporter = createTransporter();
-      const mailOptions = {
-        from: `"TradeXpert" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: '🎉 Welcome to TradeXpert - Your Trading Journey Begins!',
-        html: welcomeEmailTemplate(userName),
-        attachments: [
-          {
-            filename: 'TradeXpert_Welcome_Guide.pdf',
-            path: pdfPath,
-            contentType: 'application/pdf'
-          }
-        ]
-      };
-
-      const info = await transporter.sendMail(mailOptions);
-      console.log('[EMAIL] Welcome email sent successfully via Gmail:', info.messageId);
-      return { success: true, messageId: info.messageId };
+    if (!resendClient) {
+      // Development mode - just log to console
+      console.log('✅ [DEV MODE] Welcome email logged to console above');
+      return { success: true, messageId: 'console-log', mode: 'development' };
     }
+    
+    // Production mode - send via Resend (no PDF attachment on free plan)
+    const result = await resendClient.emails.send({
+      from: 'TradeXpert <onboarding@resend.dev>',
+      to: email,
+      subject: '🎉 Welcome to TradeXpert - Your Trading Journey Begins!',
+      html: welcomeEmailTemplate(userName),
+    });
+    
+    if (result.error) {
+      console.error('❌ Resend API error for welcome email:', result.error);
+      throw new Error(`Resend error: ${JSON.stringify(result.error)}`);
+    }
+    
+    console.log('✅ Welcome email sent via Resend:', result.data?.id || result.id);
+    return { success: true, messageId: result.data?.id || result.id, mode: 'production' };
+    
   } catch (error) {
-    console.error('[EMAIL] Error sending welcome email:', error);
-    throw new Error('Failed to send welcome email');
+    console.error('❌ Error sending welcome email:', error.message);
+    // Welcome email is not critical - user is already verified
+    if (!createResendClient()) {
+      console.log('💡 Development mode: Welcome email logged to console');
+      return { success: true, messageId: 'console-fallback', mode: 'development-fallback' };
+    }
+    // Don't throw - welcome email failure shouldn't block user registration
+    return { success: false, error: error.message };
   }
 };
+
+module.exports = { sendOTPEmail, sendWelcomeEmail };
 
 module.exports = { sendOTPEmail, sendWelcomeEmail };
