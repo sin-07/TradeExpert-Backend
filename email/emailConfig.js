@@ -16,7 +16,7 @@ const createTransporter = () => {
   }
 
   console.log('[EMAIL] ✅ Using Gmail SMTP for email delivery');
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
