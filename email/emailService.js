@@ -1,5 +1,5 @@
 const { createTransporter } = require('./emailConfig');
-const { otpEmailTemplate, welcomeEmailTemplate } = require('./emailTemplates');
+const { otpEmailTemplate, welcomeEmailTemplate, orderConfirmationEmailTemplate } = require('./emailTemplates');
 
 /**
  * Send OTP email using Gmail SMTP
@@ -91,6 +91,50 @@ const sendWelcomeEmail = async (email, userName) => {
   }
 };
 
-module.exports = { sendOTPEmail, sendWelcomeEmail };
+/**
+ * Send order confirmation email using Gmail SMTP
+ * Falls back to console if email is not configured
+ */
+const sendOrderConfirmationEmail = async (email, userName, orderDetails) => {
+  // Always log to console as backup
+  console.log('\n' + '='.repeat(60));
+  console.log(`📊 ORDER ${orderDetails.side.toUpperCase()} CONFIRMATION`);
+  console.log('='.repeat(60));
+  console.log('To:', email);
+  console.log('User:', userName);
+  console.log('Order ID:', orderDetails.orderId);
+  console.log('Symbol:', orderDetails.symbol);
+  console.log('Action:', orderDetails.side);
+  console.log('Quantity:', orderDetails.quantity);
+  console.log('Price:', `₹${orderDetails.price.toFixed(2)}`);
+  console.log('Total Amount:', `₹${orderDetails.totalAmount.toFixed(2)}`);
+  console.log('='.repeat(60) + '\n');
 
-module.exports = { sendOTPEmail, sendWelcomeEmail };
+  const transporter = createTransporter();
+  
+  if (!transporter) {
+    console.log('✅ [CONSOLE MODE] Order confirmation logged - email not configured');
+    return { success: true, messageId: 'console-log', mode: 'console' };
+  }
+
+  try {
+    const mailOptions = {
+      from: `"TradeXpert Trading" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: `${orderDetails.side === 'Buy' ? '✅' : '💰'} Order ${orderDetails.side} Confirmation - ${orderDetails.symbol}`,
+      html: orderConfirmationEmailTemplate(userName, orderDetails),
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Order confirmation email sent successfully via Gmail:', info.messageId);
+    console.log('📬 Email delivered to:', email);
+    return { success: true, messageId: info.messageId, mode: 'gmail' };
+    
+  } catch (error) {
+    console.error('❌ Error sending order confirmation email:', error.message);
+    console.log('💡 Order details logged to console - order was executed successfully');
+    return { success: false, error: error.message, mode: 'error-fallback' };
+  }
+};
+
+module.exports = { sendOTPEmail, sendWelcomeEmail, sendOrderConfirmationEmail };

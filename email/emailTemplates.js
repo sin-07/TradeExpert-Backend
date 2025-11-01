@@ -153,4 +153,213 @@ const welcomeEmailTemplate = (userName) => {
   `;
 };
 
-module.exports = { otpEmailTemplate, welcomeEmailTemplate };
+const orderConfirmationEmailTemplate = (userName, orderDetails) => {
+  const { side, symbol, stockName, quantity, price, totalAmount, orderType, market, orderId, executedAt } = orderDetails;
+  
+  const isBuy = side === 'Buy';
+  const actionColor = isBuy ? '#10b981' : '#ef4444';
+  const actionText = isBuy ? 'BOUGHT' : 'SOLD';
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f4;
+          margin: 0;
+          padding: 0;
+        }
+        .container {
+          max-width: 600px;
+          margin: 40px auto;
+          background-color: #ffffff;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+          background: ${actionColor};
+          padding: 30px;
+          text-align: center;
+        }
+        .header h1 {
+          color: #ffffff;
+          margin: 0;
+          font-size: 28px;
+        }
+        .header p {
+          color: #ffffff;
+          margin: 10px 0 0 0;
+          font-size: 16px;
+        }
+        .content {
+          padding: 40px 30px;
+        }
+        .order-box {
+          background: linear-gradient(135deg, ${actionColor}15 0%, ${actionColor}30 100%);
+          border-left: 4px solid ${actionColor};
+          padding: 25px;
+          border-radius: 8px;
+          margin: 30px 0;
+        }
+        .order-row {
+          display: flex;
+          justify-content: space-between;
+          padding: 10px 0;
+          border-bottom: 1px solid #e0e0e0;
+        }
+        .order-row:last-child {
+          border-bottom: none;
+        }
+        .label {
+          color: #666666;
+          font-weight: 500;
+        }
+        .value {
+          color: #333333;
+          font-weight: 600;
+        }
+        .total-row {
+          background-color: ${actionColor}20;
+          padding: 15px;
+          border-radius: 5px;
+          margin-top: 15px;
+        }
+        .total-row .label {
+          font-size: 18px;
+          color: #333333;
+        }
+        .total-row .value {
+          font-size: 24px;
+          color: ${actionColor};
+        }
+        .info-text {
+          color: #666666;
+          line-height: 1.6;
+          margin: 20px 0;
+        }
+        .success-badge {
+          display: inline-block;
+          background-color: ${actionColor};
+          color: white;
+          padding: 8px 20px;
+          border-radius: 20px;
+          font-weight: bold;
+          font-size: 14px;
+          margin: 20px 0;
+        }
+        .footer {
+          background-color: #f8f9fa;
+          padding: 20px;
+          text-align: center;
+          color: #6c757d;
+          font-size: 14px;
+        }
+        .disclaimer {
+          background-color: #fff3cd;
+          border-left: 4px solid #ffc107;
+          padding: 15px;
+          margin: 20px 0;
+          color: #856404;
+          font-size: 13px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🎉 Order ${actionText} Successfully!</h1>
+          <p>TradeXpert - Your Trading Partner</p>
+        </div>
+        <div class="content">
+          <h2>Hello ${userName}!</h2>
+          <p class="info-text">
+            Your ${side.toLowerCase()} order has been executed successfully. Here are the details:
+          </p>
+          
+          <div class="success-badge">✓ ORDER FILLED</div>
+          
+          <div class="order-box">
+            <div class="order-row">
+              <span class="label">Order ID:</span>
+              <span class="value">#${orderId}</span>
+            </div>
+            <div class="order-row">
+              <span class="label">Stock Symbol:</span>
+              <span class="value">${symbol}</span>
+            </div>
+            <div class="order-row">
+              <span class="label">Stock Name:</span>
+              <span class="value">${stockName}</span>
+            </div>
+            <div class="order-row">
+              <span class="label">Market:</span>
+              <span class="value">${market.toUpperCase()}</span>
+            </div>
+            <div class="order-row">
+              <span class="label">Action:</span>
+              <span class="value" style="color: ${actionColor};">${side.toUpperCase()}</span>
+            </div>
+            <div class="order-row">
+              <span class="label">Order Type:</span>
+              <span class="value">${orderType}</span>
+            </div>
+            <div class="order-row">
+              <span class="label">Quantity:</span>
+              <span class="value">${quantity} shares</span>
+            </div>
+            <div class="order-row">
+              <span class="label">Price per Share:</span>
+              <span class="value">₹${price.toFixed(2)}</span>
+            </div>
+            <div class="order-row">
+              <span class="label">Executed At:</span>
+              <span class="value">${new Date(executedAt).toLocaleString()}</span>
+            </div>
+            
+            <div class="total-row">
+              <div class="order-row">
+                <span class="label">Total Amount:</span>
+                <span class="value">₹${totalAmount.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+          
+          <p class="info-text">
+            ${isBuy 
+              ? `The amount of ₹${totalAmount.toFixed(2)} has been deducted from your account balance.`
+              : `The amount of ₹${totalAmount.toFixed(2)} has been credited to your account balance.`
+            }
+          </p>
+          
+          <div class="disclaimer">
+            <strong>Disclaimer:</strong> This is a simulated trading platform for educational purposes. 
+            No real money or stocks are involved in this transaction. Please trade responsibly and 
+            conduct thorough research before making investment decisions in real markets.
+          </div>
+          
+          <p class="info-text">
+            You can view your complete portfolio and trading history in your dashboard.
+          </p>
+        </div>
+        <div class="footer">
+          <p>© ${new Date().getFullYear()} TradeXpert. All rights reserved.</p>
+          <p>This is an automated message, please do not reply to this email.</p>
+          <p style="margin-top: 10px;">
+            Need help? Contact us at <a href="mailto:support@tradexpert.com">support@tradexpert.com</a>
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
+module.exports = {
+  otpEmailTemplate,
+  welcomeEmailTemplate,
+  orderConfirmationEmailTemplate
+};
+

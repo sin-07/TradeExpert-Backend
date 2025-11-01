@@ -15,6 +15,7 @@ const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const stockRoutes = require('./routes/stocks');
 const searchRoutes = require('./routes/search');
+const tradingRoutes = require('./routes/trading');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -79,7 +80,8 @@ app.get('/', (req, res) => {
       products: '/api/products',
       orders: '/api/orders',
       stocks: '/api/stocks',
-      search: '/api/search'
+      search: '/api/search',
+      trading: '/api/trading'
     }
   });
 });
@@ -90,6 +92,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/stocks', stockRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/trading', tradingRoutes);
 
 // Health
 app.get('/api/health', (req, res) => res.json({ ok: true, time: new Date() }));
