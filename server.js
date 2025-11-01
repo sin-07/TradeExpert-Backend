@@ -34,8 +34,9 @@ const allowedOrigins = [
   'http://localhost:5173', // Development
   'http://localhost:3000', // Alternative dev port
   'https://trade-expert-frontend.vercel.app', // Production frontend
-  'https://tradeexpert-backend.onrender.com', // Old backend URL
-  'https://tradeexpert-backend-1.onrender.com', // New backend URL
+  'https://tradeexpert-backend.onrender.com', // Legacy backend URL
+  'https://tradeexpert-backend-1.onrender.com', // Previous production backend
+  'https://tradeexpert-backend-2.onrender.com', // Current production backend
   process.env.FRONTEND_URL, // From .env (dev)
   process.env.PRODUCTION_URL, // From .env (production)
 ].filter(Boolean);
