@@ -17,14 +17,19 @@ const createTransporter = () => {
 
   console.log('[EMAIL] ✅ Using Gmail SMTP for email delivery');
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // Use SSL to avoid STARTTLS negotiation timeouts on Render
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 20000,
+    pool: true,
+    maxConnections: 1,
+    maxMessages: 5,
+    connectionTimeout: 30000,
+    greetingTimeout: 20000,
+    socketTimeout: 60000,
   });
 };
 
