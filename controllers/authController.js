@@ -3,9 +3,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const PendingUser = require('../models/PendingUser');
-const { sendOTPEmail, sendWelcomeEmail } = require('../email/emailService');
+const { sendOTPEmail, sendWelcomeEmail, sendPasswordResetEmail } = require('../email/emailService');
 
-// Generate 6-digit OTP
+// Generate 6-digit OTP/Reset Token
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
@@ -186,4 +186,67 @@ exports.login = async (req, res) => {
 
 exports.me = async (req, res) => {
   res.json(req.user);
+};
+
+// Forgot Password - Send reset token
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'No account found with this email' });
+    }
+
+    // Generate reset token
+    const resetToken = generateOTP();
+    const resetTokenExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Store reset token in user document
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = resetTokenExpiry;
+    await user.save();
+
+    // Send reset email
+    await sendPasswordResetEmail(email, resetToken, user.name);
+
+    res.json({ 
+      message: 'Password reset code sent to your email',
+      email: email
+    });
+  } catch (err) {
+    console.error('Forgot password error:', err.message);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+};
+
+// Reset Password - Verify token and update password
+exports.resetPassword = async (req, res) => {
+  const { email, resetToken, newPassword } = req.body;
+  
+  try {
+    const user = await User.findOne({ 
+      email,
+      resetToken,
+      resetTokenExpiry: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired reset code' });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    
+    // Clear reset token
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save();
+
+    res.json({ message: 'Password reset successful! You can now login with your new password.' });
+  } catch (err) {
+    console.error('Reset password error:', err.message);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
 };

@@ -1,5 +1,5 @@
 const { createTransporter } = require('./emailConfig');
-const { otpEmailTemplate, welcomeEmailTemplate, orderConfirmationEmailTemplate } = require('./emailTemplates');
+const { otpEmailTemplate, welcomeEmailTemplate, orderConfirmationEmailTemplate, forgotPasswordEmailTemplate } = require('./emailTemplates');
 
 /**
  * Send OTP email using Gmail SMTP
@@ -137,4 +137,46 @@ const sendOrderConfirmationEmail = async (email, userName, orderDetails) => {
   }
 };
 
-module.exports = { sendOTPEmail, sendWelcomeEmail, sendOrderConfirmationEmail };
+/**
+ * Send Password Reset email
+ */
+const sendPasswordResetEmail = async (email, resetToken, userName) => {
+  console.log('\n' + '='.repeat(60));
+  console.log('🔐 PASSWORD RESET EMAIL');
+  console.log('='.repeat(60));
+  console.log('To:', email);
+  console.log('Name:', userName);
+  console.log('');
+  console.log('🔑 RESET CODE:', resetToken);
+  console.log('');
+  console.log('⏰ Valid for: 10 minutes');
+  console.log('='.repeat(60) + '\n');
+
+  const transporter = createTransporter();
+  
+  if (!transporter) {
+    console.log('✅ [CONSOLE MODE] Reset code logged above - email not configured');
+    return { success: true, messageId: 'console-log', mode: 'console' };
+  }
+
+  try {
+    const mailOptions = {
+      from: `"TradeXpert" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Reset Your TradeXpert Password',
+      html: forgotPasswordEmailTemplate(userName, resetToken),
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Password reset email sent successfully via Gmail:', info.messageId);
+    console.log('📬 Email delivered to:', email);
+    return { success: true, messageId: info.messageId, mode: 'gmail' };
+    
+  } catch (error) {
+    console.error('❌ Error sending password reset email:', error.message);
+    console.log('💡 Fallback: Reset code is logged to console above');
+    return { success: true, messageId: 'console-fallback', mode: 'error-fallback' };
+  }
+};
+
+module.exports = { sendOTPEmail, sendWelcomeEmail, sendOrderConfirmationEmail, sendPasswordResetEmail };

@@ -357,9 +357,137 @@ const orderConfirmationEmailTemplate = (userName, orderDetails) => {
   `;
 };
 
+const forgotPasswordEmailTemplate = (userName, resetToken) => {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f4;
+          margin: 0;
+          padding: 0;
+        }
+        .container {
+          max-width: 600px;
+          margin: 40px auto;
+          background-color: #ffffff;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding: 30px;
+          text-align: center;
+        }
+        .header h1 {
+          color: #ffffff;
+          margin: 0;
+          font-size: 28px;
+        }
+        .content {
+          padding: 40px 30px;
+        }
+        .reset-box {
+          background: linear-gradient(135deg, #667eea15 0%, #764ba230 100%);
+          border-left: 4px solid #667eea;
+          padding: 25px;
+          border-radius: 8px;
+          margin: 30px 0;
+        }
+        .token-box {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: #ffffff;
+          font-size: 28px;
+          font-weight: bold;
+          text-align: center;
+          padding: 20px;
+          border-radius: 8px;
+          letter-spacing: 6px;
+          margin: 30px 0;
+        }
+        .info-text {
+          color: #666666;
+          line-height: 1.6;
+          margin: 20px 0;
+        }
+        .warning {
+          background-color: #fff3cd;
+          border-left: 4px solid #ffc107;
+          padding: 15px;
+          margin: 20px 0;
+          color: #856404;
+          font-size: 14px;
+        }
+        .footer {
+          background-color: #f8f9fa;
+          padding: 20px;
+          text-align: center;
+          color: #6c757d;
+          font-size: 14px;
+        }
+        .highlight {
+          color: #667eea;
+          font-weight: bold;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🔐 Password Reset Request</h1>
+        </div>
+        <div class="content">
+          <h2>Hello ${userName}!</h2>
+          <p class="info-text">
+            We received a request to reset your password for your TradeXpert account. 
+            Use the reset code below to set a new password.
+          </p>
+          
+          <div class="reset-box">
+            <h3 style="margin-top: 0; color: #667eea;">Your Password Reset Code:</h3>
+            <div class="token-box">${resetToken}</div>
+          </div>
+          
+          <p class="info-text">
+            This code will expire in <span class="highlight">10 minutes</span> for security reasons.
+          </p>
+          
+          <div class="warning">
+            <strong>⚠️ Security Notice:</strong> If you didn't request this password reset, 
+            please ignore this email. Your password will remain unchanged and your account is secure.
+          </div>
+          
+          <p class="info-text">
+            To reset your password:
+          </p>
+          <ol style="color: #666666; line-height: 1.8;">
+            <li>Copy the reset code above</li>
+            <li>Go to the password reset page</li>
+            <li>Enter your email and the reset code</li>
+            <li>Create a new strong password</li>
+          </ol>
+          
+          <p class="info-text" style="margin-top: 30px;">
+            If you have any questions or need assistance, please contact our support team.
+          </p>
+        </div>
+        <div class="footer">
+          <p>© ${new Date().getFullYear()} TradeXpert. All rights reserved.</p>
+          <p>This is an automated message, please do not reply to this email.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
 module.exports = {
   otpEmailTemplate,
   welcomeEmailTemplate,
-  orderConfirmationEmailTemplate
+  orderConfirmationEmailTemplate,
+  forgotPasswordEmailTemplate
 };
 

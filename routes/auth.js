@@ -42,4 +42,22 @@ router.post(
 // GET /api/auth/me
 router.get('/me', auth, authCtrl.me);
 
+// POST /api/auth/forgot-password
+router.post(
+  '/forgot-password',
+  [body('email').isEmail().withMessage('Valid email required')],
+  authCtrl.forgotPassword
+);
+
+// POST /api/auth/reset-password
+router.post(
+  '/reset-password',
+  [
+    body('email').isEmail().withMessage('Valid email required'),
+    body('resetToken').isLength({ min: 6, max: 6 }).withMessage('Reset code must be 6 digits'),
+    body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  ],
+  authCtrl.resetPassword
+);
+
 module.exports = router;
